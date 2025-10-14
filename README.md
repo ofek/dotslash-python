@@ -1,7 +1,7 @@
 # DotSlash: simplified executable deployment
 
-[![CI - Build](https://github.com/ofek/dotslash/actions/workflows/build.yml/badge.svg)](https://github.com/ofek/dotslash/actions/workflows/build.yml)
-[![CI - Test](https://github.com/ofek/dotslash/actions/workflows/test.yml/badge.svg)](https://github.com/ofek/dotslash/actions/workflows/test.yml)
+[![CI - Build](https://github.com/ofek/dotslash-python/actions/workflows/build.yml/badge.svg)](https://github.com/ofek/dotslash-python/actions/workflows/build.yml)
+[![CI - Test](https://github.com/ofek/dotslash-python/actions/workflows/test.yml/badge.svg)](https://github.com/ofek/dotslash-python/actions/workflows/test.yml)
 [![PyPI - Version](https://img.shields.io/pypi/v/dotslash.svg?logo=pypi&label=PyPI&logoColor=gold)](https://pypi.org/project/dotslash/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/dotslash.svg?color=blue&label=Downloads&logo=pypi&logoColor=gold)](https://pypi.org/project/dotslash/)
 [![Built by Hatch](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
