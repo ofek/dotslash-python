@@ -24,11 +24,12 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
+      artifact-name: ${{ steps.locate-artifact.outputs.file-name }}
       dotslash-version: ${{ steps.dotslash-version.outputs.dotslash-version }}
-      sdist-name: ${{ steps.sdist-name.outputs.sdist-name }}
 
     steps:
-    - uses: actions/checkout@v5
+    - name: Checkout repository
+      uses: actions/checkout@v5
 
     - name: Set DotSlash version
       id: dotslash-version
@@ -38,7 +39,7 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
 
-    - name: Install uv
+    - name: Install UV
       uses: astral-sh/setup-uv@v6
 
     - name: Build source distribution
@@ -46,20 +47,21 @@ jobs:
       env:
         DOTSLASH_VERSION: ${{ steps.dotslash-version.outputs.dotslash-version }}
 
-    - name: Set source distribution name
-      id: sdist-name
+    - name: Locate source distribution
+      id: locate-artifact
       run: |-
         sdist_name=$(basename dist/*)
-        echo "sdist-name=${sdist_name}" >> $GITHUB_OUTPUT
+        echo "file-name=${sdist_name}" >> $GITHUB_OUTPUT
 
-    - uses: actions/upload-artifact@v4
+    - name: Upload source distribution artifact
+      uses: actions/upload-artifact@v4
       with:
         name: artifact-sdist
-        path: dist/*
+        path: dist/${{ steps.locate-artifact.outputs.file-name }}
         if-no-files-found: error
 
   wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build wheels for ${{ matrix.archs }} on ${{ matrix.os }}
     needs:
     - sdist
     runs-on: ${{ matrix.os }}
@@ -81,13 +83,13 @@ jobs:
           archs: AMD64
 
     steps:
-    - uses: actions/checkout@v5
+    - name: Checkout repository
+      uses: actions/checkout@v5
 
     - name: Download source distribution
       uses: actions/download-artifact@v4
       with:
         name: artifact-sdist
-        merge-multiple: true
         path: dist
 
     - name: Install UV
@@ -97,12 +99,13 @@ jobs:
     - name: Build wheels
       uses: pypa/cibuildwheel@v3.2.1
       with:
-        package-dir: dist/${{ needs.sdist.outputs.sdist-name }}
+        package-dir: dist/${{ needs.sdist.outputs.artifact-name }}
       env:
         DOTSLASH_VERSION: ${{ needs.sdist.outputs.dotslash-version }}
         CIBW_ARCHS: ${{ matrix.archs }}
 
-    - uses: actions/upload-artifact@v4
+    - name: Upload wheel artifacts
+      uses: actions/upload-artifact@v4
       with:
         name: artifact-wheels-${{ matrix.os }}-${{ matrix.archs }}
         path: wheelhouse/*.whl
@@ -120,7 +123,8 @@ jobs:
       id-token: write
 
     steps:
-    - uses: actions/download-artifact@v4
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
       with:
         pattern: artifact-*
         merge-multiple: true
