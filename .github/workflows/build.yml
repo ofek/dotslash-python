@@ -25,6 +25,7 @@ jobs:
 
     outputs:
       dotslash-version: ${{ steps.dotslash-version.outputs.dotslash-version }}
+      sdist-name: ${{ steps.sdist-name.outputs.sdist-name }}
 
     steps:
     - uses: actions/checkout@v5
@@ -44,6 +45,12 @@ jobs:
       run: uv build --sdist
       env:
         DOTSLASH_VERSION: ${{ steps.dotslash-version.outputs.dotslash-version }}
+
+    - name: Set source distribution name
+      id: sdist-name
+      run: |-
+        sdist_name=$(basename dist/*)
+        echo "sdist-name=${sdist_name}" >> $GITHUB_OUTPUT
 
     - uses: actions/upload-artifact@v4
       with:
@@ -76,8 +83,21 @@ jobs:
     steps:
     - uses: actions/checkout@v5
 
+    - name: Download source distribution
+      uses: actions/download-artifact@v4
+      with:
+        name: artifact-sdist
+        merge-multiple: true
+        path: dist
+
+    - name: Install UV
+      if: runner.os != 'Linux'
+      uses: astral-sh/setup-uv@v6
+
     - name: Build wheels
       uses: pypa/cibuildwheel@v3.2.1
+      with:
+        package-dir: dist/${{ needs.sdist.outputs.sdist-name }}
       env:
         DOTSLASH_VERSION: ${{ needs.sdist.outputs.dotslash-version }}
         CIBW_ARCHS: ${{ matrix.archs }}

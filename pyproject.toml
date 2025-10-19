@@ -52,6 +52,8 @@ replacement = "-"
 [tool.cibuildwheel]
 enable = ["pypy"]
 test-command = "python -m dotslash -- cache-dir"
+# Use UV for build environment creation and installation of build dependencies
+build-frontend = "build[uv]"
 # Only build on one version of Python since all distributions of a given platform/arch pair are the same
 build = "cp314-*"
 # Disable wheel repair since it's not necessary
